@@ -40,6 +40,39 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.session.run(configuration)
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchPoint = touches.first
+        
+        // Incorporate our touchPOint to AR world
+        
+        let allARWorldObjects = sceneView.hitTest(touchPoint!.location(in: sceneView), types: [ARHitTestResult.ResultType.featurePoint])
+        
+        // Recuperate the las object of AR world
+        let lastObject = allARWorldObjects.last
+        let lastObjectTransform = lastObject!.worldTransform
+        
+        print("Transform 4x4: \(lastObjectTransform)")
+        
+        let point3D = SCNVector3(
+            lastObjectTransform[3][0],
+            lastObjectTransform[3][1],
+            lastObjectTransform[3][2]
+        )
+        print(point3D)
+        
+        addSphere(point3D: point3D)
+        
+        
+    }
+    
+    func addSphere(point3D: SCNVector3) {
+        let sphere = SCNSphere(radius: 0.01)
+        let sphereNode = SCNNode(geometry: sphere)
+        sphereNode.position = point3D
+        
+        self.sceneView.scene.rootNode.addChildNode(sphereNode)
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
